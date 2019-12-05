@@ -28,26 +28,34 @@ public class Server {
 	}
 	
 
-	public static Info changeTaskState(String nameTask, String stateTask, String nameUser) {
+	public static Info changeTaskState(Info inf) {
+		Task t1 = (Task)inf.getResultObject();
+		String nameTask = t1.getNameTask();
+		String stateTask = t1.getState();
+		String nameUser = inf.getLogin();
 		for (int i = 0; i < masTask.size(); i++) {
 			if (masTask.get(i).getNameUser().equals(nameUser) && 
 					masTask.get(i).getNameTask().equals(nameTask)) {
 				masTask.get(i).setState(stateTask);
-				return new Info(true, "Статус задачи изменен!");
+				return new Info(true, "result: state changed");
 			}
 		}
-		return new Info(false, "Невозможно выполнить операцию: задача не найдена.");
+		return new Info(false, "result: operation failed");
 	}
 
-	public static Info changeTaskWorker(String nameTask, String loginSelf, String loginTarget) {
+	public static Info changeTaskWorker(Info inf) {
+		Task t1 = (Task)inf.getResultObject();
+		String nameTask=t1 .getNameTask();
+		String loginSelf=inf.getLogin();
+		String loginTarget=t1.getNameUser();
 		for (int i = 0; i < masTask.size(); i++) {
 			if (masTask.get(i).getNameUser().equals(loginSelf) && 
 					masTask.get(i).getNameTask().equals(nameTask)) {
 				masTask.get(i).setNameUser(loginTarget);
-				return new Info(true, "Статус задачи изменен!");
+				return new Info(true, "result: owner changed");
 			}
 		}
-		return new Info(false, "Невозможно выполнить операцию: задача не найдена.");
+		return new Info(false, "result: operation failed");
 	}
 
 	public static Info getTasks(String nameUser) {
@@ -58,8 +66,8 @@ public class Server {
 			}
 
 		}
-		
-		return new Info(true, "list tasks" , masUserTask);
+		//Info inf =new Info(true, "result: all tasks" , masUserTask);
+		return new Info(true, "result: all tasks" , masUserTask);
 	}
 
 	public static Info getAllUsers() {
@@ -73,7 +81,7 @@ public class Server {
 				return new Info(false, "Задача не может быть добавлена, потому что задача с таким именем уже имеется!");
 		}
 		masTask.add(task);
-		return new Info(true, "Задача успешно добавлена!");
+		return new Info(true, "result: task added");
 	}
 	
 	/*
@@ -91,13 +99,20 @@ public class Server {
 		case "get list tasks":
 			return getTasks(inf.getLogin());
 			//break;
+		case "add new task":
+			return addTask((Task)inf.getResultObject());
+		case "change owner":
+			return changeTaskWorker(inf);
+		case "change state":
+			return changeTaskState(inf);
 		case "get all users":
 			return getAllUsers();
+		
 		default:
 			return new Info(false,"Неверная комманда!");
 		}
 	}
-	
+
 	public static String serializeInfoToXML(Info inf) {
 		XStream xstream = new XStream();
 		String xml = xstream.toXML(inf);
@@ -120,7 +135,6 @@ public class Server {
 	}
 
 	
-	
 	public static void main(String[] args) {
 		addUsers() ;
 		addTasks();
@@ -139,7 +153,7 @@ public class Server {
 				System.out.println("Сообщение клиента: " + inf.getMessage());
 				
 				Info infResponse = actionMain(inf) ;
-				infResponse.setMessage("result: all tasks");
+				
 				sendRequest(serializeInfoToXML(infResponse),s);
 				s.close();
 			}
