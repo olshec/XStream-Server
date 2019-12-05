@@ -5,7 +5,6 @@ import java.net.*;
 import java.util.ArrayList;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.security.*;
 
 
 public class Server {
@@ -72,11 +71,9 @@ public class Server {
 				str = (String) dis.readUTF();
 				
 				XStream xstream = new XStream();
-				// clear out existing permissions and set own ones
-				XStream.setupDefaultSecurity(xstream);
-				xstream.allowTypes(new String[] {"Info","pr4.Info"});
-				//xstream.allowTypeHierarchy(Collection.class);
-				// allow any type from the same package
+				// Allow types for Info
+				xstream.allowTypes(new String[] {"pr4.Info"});
+
 				inf = (Info)xstream.fromXML(str);
 				
 				System.out.println("message = " + inf.getMessage());
