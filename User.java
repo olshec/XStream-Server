@@ -5,7 +5,10 @@ public class User {
 	private String password;
 	
 	
-	
+	public User(String login, String password) {
+		setLogin(login);
+		setPassword(password);
+	}
 	public String getLogin() {
 		return login;
 	}

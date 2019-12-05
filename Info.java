@@ -13,7 +13,7 @@ public class Info  {
 	public Info(boolean result) {
 		setResult(result); 
 		}
-	public Info(boolean result, Object resultObject) {
+	public Info(boolean result, String message, Object resultObject) {
 		setResult(result); 
 		setResultObject(resultObject);
 		}

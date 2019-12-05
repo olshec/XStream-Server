@@ -10,11 +10,28 @@ import com.thoughtworks.xstream.XStream;
 public class Server {
 
 	private static ArrayList<Task> masTask=new ArrayList<Task>(0);
-	private static ArrayList<User> masUser;
+	private static ArrayList<User> masUser=new ArrayList<User>(0);
+	
+	
+	
+	public static void addUsers() {
+		for (int i = 0; i < 10; i++) {
+			masUser.add(new User("log"+i,"pas"+i));
+		}
+	}
+	
+	
+	public static void addTasks() {
+		for (int i = 0; i < 10; i++) {
+			masTask.add(new Task("task"+i,"desc"+i,"log"+i,""+(45+i)));
+		}
+	}
+	
 
 	public static Info changeTaskState(String nameTask, String stateTask, String nameUser) {
 		for (int i = 0; i < masTask.size(); i++) {
-			if (masTask.get(i).getNameUser() == nameUser && masTask.get(i).getNameTask() == nameTask) {
+			if (masTask.get(i).getNameUser().equals(nameUser) && 
+					masTask.get(i).getNameTask().equals(nameTask)) {
 				masTask.get(i).setState(stateTask);
 				return new Info(true, "Статус задачи изменен!");
 			}
@@ -24,9 +41,9 @@ public class Server {
 
 	public static Info changeTaskWorker(String nameTask, String loginSelf, String loginTarget) {
 		for (int i = 0; i < masTask.size(); i++) {
-			if (masTask.get(i).getNameUser() == loginSelf && masTask.get(i).getNameTask() == nameTask) {
+			if (masTask.get(i).getNameUser().equals(loginSelf) && 
+					masTask.get(i).getNameTask().equals(nameTask)) {
 				masTask.get(i).setNameUser(loginTarget);
-				;
 				return new Info(true, "Статус задачи изменен!");
 			}
 		}
@@ -36,22 +53,23 @@ public class Server {
 	public static Info getTasks(String nameUser) {
 		ArrayList<Task> masUserTask = new ArrayList<Task>(0);
 		for (int i = 0; i < masTask.size(); i++) {
-			if (masTask.get(i).getNameUser() == nameUser) {
+			if (masTask.get(i).getNameUser().equals(nameUser)) {
 				masUserTask.add(masTask.get(i));
 			}
 
 		}
-		return new Info(true, masUserTask);
+		
+		return new Info(true, "list tasks" , masUserTask);
 	}
 
 	public static Info getAllUsers() {
-		return new Info(true, masUser);
+		return new Info(true,"list all users",masUser);
 	}
 
 	public static Info addTask(Task task) {
-		String nameTask = task.getNameTask();
+		//String nameTask = task.getNameTask();
 		for (int i = 0; i < masTask.size(); i++) {
-			if (masTask.get(i).getNameTask() == nameTask)
+			if (masTask.get(i).getNameTask().equals(task.getNameTask()))
 				return new Info(false, "Задача не может быть добавлена, потому что задача с таким именем уже имеется!");
 		}
 		masTask.add(task);
@@ -104,6 +122,8 @@ public class Server {
 	
 	
 	public static void main(String[] args) {
+		addUsers() ;
+		addTasks();
 		// TODO Auto-generated method stub
 		System.out.println("Сервер запущен!");
 		Info inf = new Info(true,"");

@@ -6,6 +6,15 @@ public class Task {
 	private String nameUser;
 	private String state;
 	
+	
+	public Task(String nameTask, String description, 
+			String nameUser, String state) {
+		setNameTask(nameTask);
+		setDescription(description);
+		setNameUser(nameUser);
+		setState(state);
+	}
+	
 	public String getNameTask() {
 		return nameTask;
 	}
