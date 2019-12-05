@@ -1,6 +1,7 @@
+
 package pr4;
 
-public class Info {
+public class Info  {
 	private String login;
 	private String password;
 	private boolean result;
