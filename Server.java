@@ -78,7 +78,7 @@ public class Server {
 		//String nameTask = task.getNameTask();
 		for (int i = 0; i < masTask.size(); i++) {
 			if (masTask.get(i).getNameTask().equals(task.getNameTask()))
-				return new Info(false, "Задача не может быть добавлена, потому что задача с таким именем уже имеется!");
+				return new Info(false, "result: operation failed");
 		}
 		masTask.add(task);
 		return new Info(true, "result: task added");
