@@ -15,6 +15,7 @@ public class Info  {
 		}
 	public Info(boolean result, String message, Object resultObject) {
 		setResult(result); 
+		setMessage(message);
 		setResultObject(resultObject);
 		}
 	public Info(boolean result, String message) {
