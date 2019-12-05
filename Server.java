@@ -9,10 +9,10 @@ import com.thoughtworks.xstream.XStream;
 
 public class Server {
 
-	private ArrayList<Task> masTask;
-	private ArrayList<User> masUser;
+	private static ArrayList<Task> masTask=new ArrayList<Task>(0);
+	private static ArrayList<User> masUser;
 
-	public Info changeTaskState(String nameTask, String stateTask, String nameUser) {
+	public static Info changeTaskState(String nameTask, String stateTask, String nameUser) {
 		for (int i = 0; i < masTask.size(); i++) {
 			if (masTask.get(i).getNameUser() == nameUser && masTask.get(i).getNameTask() == nameTask) {
 				masTask.get(i).setState(stateTask);
@@ -22,7 +22,7 @@ public class Server {
 		return new Info(false, "Невозможно выполнить операцию: задача не найдена.");
 	}
 
-	public Info changeTaskWorker(String nameTask, String loginSelf, String loginTarget) {
+	public static Info changeTaskWorker(String nameTask, String loginSelf, String loginTarget) {
 		for (int i = 0; i < masTask.size(); i++) {
 			if (masTask.get(i).getNameUser() == loginSelf && masTask.get(i).getNameTask() == nameTask) {
 				masTask.get(i).setNameUser(loginTarget);
@@ -33,7 +33,7 @@ public class Server {
 		return new Info(false, "Невозможно выполнить операцию: задача не найдена.");
 	}
 
-	public Info getTasks(String nameUser) {
+	public static Info getTasks(String nameUser) {
 		ArrayList<Task> masUserTask = new ArrayList<Task>(0);
 		for (int i = 0; i < masTask.size(); i++) {
 			if (masTask.get(i).getNameUser() == nameUser) {
@@ -44,11 +44,11 @@ public class Server {
 		return new Info(true, masUserTask);
 	}
 
-	public Info getAllUsers() {
+	public static Info getAllUsers() {
 		return new Info(true, masUser);
 	}
 
-	public Info addTask(Task task) {
+	public static Info addTask(Task task) {
 		String nameTask = task.getNameTask();
 		for (int i = 0; i < masTask.size(); i++) {
 			if (masTask.get(i).getNameTask() == nameTask)
@@ -57,7 +57,52 @@ public class Server {
 		masTask.add(task);
 		return new Info(true, "Задача успешно добавлена!");
 	}
+	
+	/*
+	 * 
+	 */
+	public static Info getStringFromXML(String str) {
+		XStream xstream = new XStream();
+		// Allow types for Info
+		xstream.allowTypes(new String[] {"pr4.Info"});
+		return (Info)xstream.fromXML(str);
+	}
+	
+	public static Info actionMain(Info inf) {
+		switch (inf.getMessage()) {
+		case "get list tasks":
+			return getTasks(inf.getLogin());
+			//break;
+		case "get all users":
+			return getAllUsers();
+		default:
+			return new Info(false,"Неверная комманда!");
+		}
+	}
+	
+	public static String serializeInfoToXML(Info inf) {
+		XStream xstream = new XStream();
+		String xml = xstream.toXML(inf);
+		return xml;
+	}
+	
+	public static void sendRequest(String str, Socket s) {
 
+		try {
+			DataOutputStream dout = new DataOutputStream(s.getOutputStream());
+			dout.writeUTF(str);
+			dout.flush();
+			dout.close();
+			
+		} catch (
+
+		Exception e) {
+			System.out.println(e);
+		}
+	}
+
+	
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		System.out.println("Сервер запущен!");
@@ -68,15 +113,15 @@ public class Server {
 			while (!inf.getMessage().equals("end")) {
 				Socket s = ss.accept();// establishes connection
 				DataInputStream dis = new DataInputStream(s.getInputStream());
+				
 				str = (String) dis.readUTF();
+				inf = getStringFromXML(str);
+				System.out.println("Сообщение клиента: " + inf.getMessage());
 				
-				XStream xstream = new XStream();
-				// Allow types for Info
-				xstream.allowTypes(new String[] {"pr4.Info"});
-
-				inf = (Info)xstream.fromXML(str);
-				
-				System.out.println("message = " + inf.getMessage());
+				Info infResponse = actionMain(inf) ;
+				infResponse.setMessage("result: all tasks");
+				sendRequest(serializeInfoToXML(infResponse),s);
+				s.close();
 			}
 			System.out.println("Сервер остановлен!");
 			ss.close();
