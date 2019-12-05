@@ -109,7 +109,7 @@ public class Server {
 			return getAllUsers();
 		
 		default:
-			return new Info(false,"Неверная комманда!");
+			return new Info(false,"result: command not found");
 		}
 	}
 
