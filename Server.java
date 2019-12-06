@@ -50,10 +50,15 @@ public class Server {
 		for (int j = 0; j < masUser.size(); j++)
 			if (masUser.get(j).getLogin().equals(nameUser) && masUser.get(j).getPassword().equals(password))
 				return true;
-
 		return false;
 	}
 
+	public static Info authentication(Info inf) {
+		if (checkUserPermission(inf.getLogin(), inf.getPassword()))
+			return new Info(true, "authentication: ok");
+		return new Info(false, "authentication: failed");
+	}
+	
 	public static Info changeTaskState(Info inf) {
 
 		Task t1 = (Task) inf.getResultObject();
@@ -81,8 +86,8 @@ public class Server {
 		if (existsUser(loginTarget)) {
 			if (checkUserPermission(inf.getLogin(), inf.getPassword(), nameTask)) {
 				for (int i = 0; i < masTask.size(); i++) {
-					if(masTask.get(i).getNameUser().equals(inf.getLogin()) &&
-							masTask.get(i).getNameTask().equals(nameTask)) {
+					if (masTask.get(i).getNameUser().equals(inf.getLogin())
+							&& masTask.get(i).getNameTask().equals(nameTask)) {
 						masTask.get(i).setNameUser(loginTarget);
 						return new Info(true, "result: owner changed");
 					}
@@ -102,15 +107,15 @@ public class Server {
 					&& masTask.get(i).getNameUser().equals(inf.getLogin())) {
 				masUserTask.add(masTask.get(i));
 			}
-
 		}
-
 		return new Info(true, "result: all tasks", masUserTask);
 	}
 
-//	public static Info getAllUsers() {
-//		return new Info(true,"list all users",masUser);
-//	}
+	public static Info getListUsers(Info inf) {
+		if (checkUserPermission(inf.getLogin(), inf.getPassword()))
+			return new Info(true, "result: all users", masUser);
+		return new Info(false, "result: operarion failed");
+	}
 
 	public static Info addTask(Info inf) {
 		Task task = (Task) inf.getResultObject();
@@ -122,7 +127,6 @@ public class Server {
 			}
 		}
 		return new Info(false, "result: operation failed");
-
 	}
 
 	/*
@@ -131,7 +135,7 @@ public class Server {
 	public static Info getStringFromXML(String str) {
 		XStream xstream = new XStream();
 		// Allow types for Info
-		xstream.allowTypes(new String[] { "pr4.Info" });
+		xstream.allowTypes(new String[] { "pr4.Info","pr4.User" });
 		return (Info) xstream.fromXML(str);
 	}
 
@@ -146,6 +150,10 @@ public class Server {
 			return changeTaskOwner(inf);
 		case "change state":
 			return changeTaskState(inf);
+		case "get list users":
+			return getListUsers(inf);
+		case "authentication":
+			return authentication(inf);
 //		case "get all users":
 //			return getAllUsers();
 
