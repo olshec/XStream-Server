@@ -81,7 +81,6 @@ public class Server {
 
 		Task t1 = (Task) inf.getResultObject();
 		String nameTask = t1.getNameTask();
-		// String loginSelf = inf.getLogin();
 		String loginTarget = t1.getNameUser();
 		if (existsUser(loginTarget)) {
 			if (checkUserPermission(inf.getLogin(), inf.getPassword(), nameTask)) {
@@ -129,9 +128,6 @@ public class Server {
 		return new Info(false, "result: operation failed");
 	}
 
-	/*
-	 * 
-	 */
 	public static Info getStringFromXML(String str) {
 		XStream xstream = new XStream();
 		// Allow types for Info
@@ -154,9 +150,6 @@ public class Server {
 			return getListUsers(inf);
 		case "authentication":
 			return authentication(inf);
-//		case "get all users":
-//			return getAllUsers();
-
 		default:
 			return new Info(false, "result: command not found");
 		}
